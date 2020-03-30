@@ -2,6 +2,8 @@
 
 These projects are stock market forecasting robots using AI techniques using technical and fundamentalist strategies.
 
+IMPORTANT: All codes are under construction
+
 Projects:
 
 Carbon > Supporting Vector Machine (SVM)
