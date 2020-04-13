@@ -6,7 +6,7 @@ IMPORTANT: All codes are under construction. Some experiments are available like
 
 Projects:
 
-Carbon > Supporting Vector Machine (SVM)
+Carbon > Supporting Vector Machine (SVM) / Random Forrest Classifier etc.
 
 Hydrogen > Long-Short Term Memory - neural networks (LSTM)
 
