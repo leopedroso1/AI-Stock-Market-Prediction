@@ -2,7 +2,7 @@
 
 These projects are stock market forecasting robots using AI techniques using technical and fundamentalist strategies.
 
-IMPORTANT: All codes are under construction
+IMPORTANT: All codes are under construction. Some experiments are available like QLearning stock market
 
 Projects:
 
