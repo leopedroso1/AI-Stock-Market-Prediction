@@ -2,7 +2,7 @@
 
 These projects are stock market forecasting / decision recommendation robots using AI techniques, using both technical and fundamentalist strategies.
 
-Main Vision in all projects: Simple and accurate > Complex and inaccurate! 
+# Main Vision in all projects: Simple and accurate > Complex and inaccurate! 
 
 Active Projects - you can check the code being develop in each folder -  If folder == empty then i am fixing bugs or applying optimizations ;)
 
