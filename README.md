@@ -4,7 +4,7 @@ These projects are stock market forecasting / decision recommendation robots usi
 
 Main Vision in all projects: Simple and accurate > Complex and inaccurate! 
 
-Active Projects - you can check the code being develop in each folder -  If folder == empty then i am fixing bugs or applying optimizations ;)
+Active Projects - you can check the code being developed in each folder -  If folder == empty then i am fixing bugs or applying optimizations ;)
 
 * Carbon > Classical Machine Learning methods like Supporting Vector Machine (SVM) / Random Forrest Classifier etc. 
 
