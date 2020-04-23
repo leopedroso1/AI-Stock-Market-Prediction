@@ -1,4 +1,4 @@
-# Stock Market Prediction using Artificial Intelligence!!
+# Stock market prediction using Artificial Intelligence
 
 These projects are stock market forecasting / decision recommendation robots using AI techniques, using both technical and fundamentalist strategies.
 
