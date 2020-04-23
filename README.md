@@ -1,13 +1,18 @@
 # AI-Stock-Market-Prediction
 
-These projects are stock market forecasting robots using AI techniques using technical and fundamentalist strategies.
+These projects are stock market forecasting / decision recommendation robots using AI techniques, using both technical and fundamentalist strategies.
 
-IMPORTANT: All codes are under construction. Some experiments are available like QLearning stock market
+Main Vision in all projects: Simple and accurate > Complex and inaccurate! 
 
-Projects:
+Active Projects - you can check the code being develop in each folder -  If folder == empty then i am fixing bugs or applying optimizations ;)
 
-Carbon > Supporting Vector Machine (SVM) / Random Forrest Classifier etc.
+  Carbon > Classical Machine Learning methods like Supporting Vector Machine (SVM) / Random Forrest Classifier etc. 
 
-Hydrogen > Long-Short Term Memory - neural networks (LSTM)
+  Hydrogen > Artificial neural networks and reinforcement learning topologies/algorithms experiments like Long-Short Term Memory - neural networks (LSTM), Reinforcement Learning, QLearning, A2C, Curiosity Driven etc.
 
-Oxgygen > NeuroEvolution Augumented Topologies - neural networks (NEAT)
+  Oxgygen > NeuroEvolution Augumented Topologies - neural networks (NEAT) topology as a evolutional neural network. Given its particularity i've separated in another special project.
+
+IMPORTANT: All codes are under construction =)
+
+IMPORTANT 2: Suggestions? Feel free to tell me =) I'd like to learn even more!
+
