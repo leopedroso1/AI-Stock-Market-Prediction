@@ -151,7 +151,7 @@ linear_regression = LinearRegression().fit(x_train, y_train)
 random_forest_reg = RandomForestRegressor(n_estimators= 100, random_state= 0).fit(x_train, y_train)
 
 ### Model 4 >> Regression >> Support Vector Regressor ###
-svr_regressor = SVR(kernel= 'linear').fit(x_train, y_train) #Parameter kernel: 'linear', 'poly', 'sigmoid', 'rbf' (Gaussian) -  Default
+svr_regressor = SVR(kernel= 'rbf').fit(x_train, y_train) #Parameter kernel: 'linear', 'poly', 'sigmoid', 'rbf' (Gaussian) -  Default
 # Note: Gaussian kernel exhibited better results
 
 x_future = df.drop(['Date','Prediction'], 1)[:-forecast_days]
