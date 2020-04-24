@@ -22,9 +22,10 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import Imputer
 
 # Machine Learning Models
+from tensorflow.keras import backend
 from sklearn.preprocessing import MinMaxScaler
-from keras.models import Sequential
-from keras.layers import Dense, LSTM
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Dense, LSTM
 
 # Data Analysis 
 # TO DO >> Create a classification 'buy', 'hold', 'short' given some % margin
@@ -82,16 +83,22 @@ def calulateRSI(series, period):
 
 df = pd.read_csv(r'C:\Users\Leonardo\Desktop\Oxford\Stock Market AI\Data\PETR4_SA.csv', parse_dates = ['Date']) # parse_dates = ['Date'] >> Force this column to be a date. 
 
+df.dropna(inplace=True) # Remove NaN lines from stock market holydays
+
+df_close = df.filter(['Close'])
+
+dataset_close = df_close.values
+
 # Testing: 1
 #df.plot(x='Date', y='Adj Close', kind='line')
 #plt.show()
 
-df.dropna(inplace=True) # Remove NaN lines from stock market holydays
 #df.sort_values(by='Date', inplace=True, ascending=False) # Sorting for last recent data
 
 ################################## Variables Settup ########################################################
 
 forecast_days = 7
+training_data_len = math.ceil( len(dataset_close) * 0.8 ) # 80% for training
 current_price = 0
 n_stocks = 0
 wallet = n_stocks * current_price
@@ -116,13 +123,95 @@ df['Delta'] = df['Close'].diff()
 # RS - Relative Strength >> Average gain of last 14 trading days / Average loss of last 14 trading days
 df['Rsi'] = calulateRSI(df,14)
 
-################################ Data Preprocessing ######################################################
+################################ Data Preprocessing and Training data sets ######################################################
 
-
-# NaN treatment
+# NaN treatment  >>> Bound with other variables for a better LSTM
 imputer = Imputer(missing_values = 'NaN', strategy = 'mean', axis = 0)
 imputer = imputer.fit(df[['Delta','Rsi']])
 df[['Delta','Rsi']] = imputer.transform(df[['Delta','Rsi']])
 
-# Column prediction using '-n' days for forecasting
-df['Prediction'] = df[['Close']].shift(-forecast_days)
+# Scale the data 
+scaler = MinMaxScaler(feature_range=(0,1))
+scaled_data = scaler.fit_transform(dataset_close)
+
+# Create traing data set with 80% of our original dataset
+train_dataset = scaled_data[0:training_data_len, :]
+
+#split in x_train and y_train
+x_train = []
+y_train = []
+
+# 60 for 60 days
+for i in range(60, len(train_dataset)):
+
+    x_train.append(train_dataset[i-60:i, 0])
+    y_train.append(train_dataset[i, 0])
+    
+    if i <= 60:
+        print(x_train)
+        print(y_train)
+        print()
+        
+# Convert x_train and y_train to numpuy arrays
+x_train, y_train = np.array(x_train), np.array(y_train)
+
+# Reshape the train dataset because LSTM expect 3D data
+x_train = np.reshape(x_train, (x_train.shape[0], x_train.shape[1], 1)) # >> 1 because we are using just the "close"
+
+################################ Machine Learning Models #################################################
+
+#### LSTM ###
+lstm = Sequential()
+lstm.add(LSTM(50, return_sequences=True, input_shape= (x_train.shape[1], 1))) # Input layer
+lstm.add(LSTM(50, return_sequences=False)) # Hidden
+lstm.add(Dense(25)) # Hidden
+lstm.add(Dense(1)) # Output
+
+# Compile the model
+lstm.compile(optimizer='adam', loss='mean_squared_error')
+
+# Train the model
+lstm.fit(x_train, y_train, batch_size= 1, epochs= 10) # >> Change here later
+
+# Create new array with scaled values with testing data
+test_data = scaled_data[training_data_len - 60:, :]
+
+# Create x_test, y_test
+x_test = []
+y_test = dataset_close[training_data_len:, :]
+
+for i in range(60, len(test_data)):
+
+    x_test.append(test_data[i-60:i, 0])
+        
+# Covert the data to numpy array 
+x_test = np.array(x_test)
+
+# Reshape the data
+x_test = np.reshape(x_test, (x_test.shape[0], x_test.shape[1], 1))
+
+# Get the model predictions for price values
+predictions = lstm.predict(x_test)
+predictions = scaler.inverse_transform(predictions) # Transform in readable data
+
+# Get the root mean squared error (RMSE)
+rmse = np.sqrt(np.mean(predictions - y_test) ** 2)
+print(rmse)
+
+# Plot data!
+train = df_close[:training_data_len]
+valid = df_close[training_data_len:]
+valid['Predictions'] = predictions
+
+# Visualize the model 
+plt.figure(figsize=(16,8))
+plt.title('Hydrogen Long-Short Term Memory (LSTM) Artificial Neural Network - PETR4')
+plt.xlabel('Date', fontsize = 18)
+plt.ylabel('Closing Price (BRL)', fontsize = 18)
+plt.plot(train['Close'])
+plt.plot(valid[['Close', 'Predictions']])
+plt.legend(['Historic (Train)','Validation', 'Predictions'], loc='lower right')
+plt.show()
+
+
+
