@@ -18,10 +18,13 @@ import numpy as np
 
 # Preprocessing libraries
 from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import Imputer
 
 # Machine Learning Models
 from sklearn.tree import DecisionTreeRegressor
 from sklearn.linear_model import LinearRegression
+from sklearn.ensemble import VotingClassifier, RandomForestClassifier, RandomForestRegressor
+from sklearn.svm import SVR
 
 # Data Analysis 
 # TO DO >> Create a classification 'buy', 'hold', 'short' given some % margin
@@ -83,7 +86,7 @@ df = pd.read_csv(r'C:\Users\Leonardo\Desktop\Oxford\Stock Market AI\Data\PETR4_S
 #plt.show()
 
 df.dropna(inplace=True) # Remove NaN lines from stock market holydays
-df.sort_values(by='Date', inplace=True, ascending=False) # Sorting for last recent data
+#df.sort_values(by='Date', inplace=True, ascending=False) # Sorting for last recent data
 
 ################################## Variables Settup ########################################################
 
@@ -113,13 +116,18 @@ df['Delta'] = df['Close'].diff()
 df['Rsi'] = calulateRSI(df,14)
 
 ################################ Data Preprocessing ######################################################
-## TODO: NaN treatment
+
+
+# NaN treatment
+imputer = Imputer(missing_values = 'NaN', strategy = 'mean', axis = 0)
+imputer = imputer.fit(df[['Delta','Rsi']])
+df[['Delta','Rsi']] = imputer.transform(df[['Delta','Rsi']])
 
 # Column prediction using '-n' days for forecasting
 df['Prediction'] = df[['Close']].shift(-forecast_days)
 
 ## Feature data set - dependent variables (X) and convert it to a numpy array and remove the last 'n' rows/days to be predicted
-X = df.drop(['Prediction'], 1)[:-forecast_days]
+X = df.drop(['Date', 'Prediction'], 1)[:-forecast_days]
 #
 ## Target data set - independent variable (y) and convert it to a numpy array
 y = np.array(df['Prediction'])[:-forecast_days]
@@ -127,4 +135,59 @@ y = np.array(df['Prediction'])[:-forecast_days]
 ## Split data 75% training 25% testing
 x_train, x_test, y_train, y_test = train_test_split(X, y, test_size = 0.25, random_state = 0) 
 
+#print(df.dtypes)
 
+################################ Machine Learning Models #################################################
+
+# Predictions >>> Try to predict the forecast for the next 7 days 
+
+#### Model 1 >> Regression >> Decision Tree Regression ###
+decision_tree = DecisionTreeRegressor().fit(x_train, y_train)
+
+#### Model 2 >> Regression >> Linear Regression
+linear_regression = LinearRegression().fit(x_train, y_train)
+
+### Model 3 >> Regression >> Random Forest Regressor ###
+random_forest_reg = RandomForestRegressor(n_estimators= 100, random_state= 0).fit(x_train, y_train)
+
+### Model 4 >> Regression >> Support Vector Regressor ###
+svr_regressor = SVR(kernel= 'linear').fit(x_train, y_train) #Parameter kernel: 'linear', 'poly', 'sigmoid', 'rbf' (Gaussian) -  Default
+# Note: Gaussian kernel exhibited better results
+
+x_future = df.drop(['Date','Prediction'], 1)[:-forecast_days]
+x_future = x_future.tail(forecast_days)
+x_future = np.array(x_future)
+
+
+## Tree Regressor Prediction >> 
+tree_prediction = decision_tree.predict(x_future)
+
+tree_predictions = tree_prediction
+valid_tree_pred = df[X.shape[0]:]
+valid_tree_pred['Predictions'] = tree_predictions
+
+
+## Linear Regression Prediction >> 
+lr_prediction = linear_regression.predict(x_future)
+
+lr_predictions = lr_prediction
+valid_lr_pred = df[X.shape[0]:]
+valid_lr_pred['Predictions'] = lr_predictions
+
+
+## Random Forest Regressor >>
+random_forest_pred = random_forest_reg.predict(x_future)
+
+rand_forest_predictions = random_forest_pred
+valid_rf_pred = df[X.shape[0]:]
+valid_rf_pred['Predictions'] = rand_forest_predictions
+
+## Support Vector Regressor >> 
+svr_pred = svr_regressor.predict(x_future)
+
+svr_predictions = svr_pred
+valid_svr_pred = df[X.shape[0]:]
+valid_svr_pred['Predictions'] = svr_predictions
+
+# Classifiers >> Try to establish a classification given our parameters
+# UNDER CONSTRUCTION #
